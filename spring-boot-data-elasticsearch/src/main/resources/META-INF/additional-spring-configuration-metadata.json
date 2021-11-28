@@ -1,0 +1,54 @@
+{
+  "properties": [
+    {
+      "name": "elasticsearch.data.script",
+      "type": "java.lang.Boolean",
+      "description": "是否以脚本形式运行,默认false.",
+      "sourceType": "cn.yajienet.data.elasticsearch.config.ElasticSearchDataProperties",
+      "defaultValue": "false"
+    },
+    {
+      "name": "elasticsearch.data.type",
+      "type": "java.lang.String",
+      "description": "初始化模式,初始化文档并加载数据.",
+      "sourceType": "cn.yajienet.data.elasticsearch.config.ElasticSearchDataProperties",
+      "defaultValue": "init"
+    }
+  ],
+  "hints": [
+    {
+      "name": "elasticsearch.data.script",
+      "values": [
+        {
+          "value": "false",
+          "description": "以脚本方式运行."
+        },
+        {
+          "value": "true",
+          "description": "以项目方式运行."
+        }
+      ]
+    },
+    {
+      "name": "elasticsearch.data.type",
+      "values": [
+        {
+          "value": "init",
+          "description": "init 初始化模式,初始化文档并加载数据."
+        },
+        {
+          "value": "update",
+          "description": "update 更新模式,更新文档和数据."
+        },
+        {
+          "value": "delete",
+          "description": "delete 删除模式,删除索引和数据."
+        },
+        {
+          "value": "none",
+          "description": "none NONE模式,不做任何工作."
+        }
+      ]
+    }
+  ]
+}

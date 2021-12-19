@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "elasticsearch.data.document-scan-packages",
+      "type": "java.util.List",
+      "description": "配置扫描文档包.",
+      "sourceType": "cn.yajienet.data.elasticsearch.properties.ElasticSearchProperties"
+    }
+  ],
+  "hints": []
+    }
+  ]
+}

@@ -26,7 +26,7 @@
     <dependencies>
         <dependency>
             <groupId>cn.yajienet.data</groupId>
-            <artifactId>spring-boot-data-elasticsearch</artifactId>
+            <artifactId>elasticsearch-data-services</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

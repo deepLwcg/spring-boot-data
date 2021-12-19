@@ -15,7 +15,7 @@ import lombok.Data;
  * @Description
  */
 @Data
-@Document(index = "yajienet-test", alias = "test",setting = TestSetting.class)
+@Document(index = "yajienet-test", alias = "test")
 public class Test001 {
 
     @Field(type = FieldType.Keyword)

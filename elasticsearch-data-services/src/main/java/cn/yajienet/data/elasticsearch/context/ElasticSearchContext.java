@@ -7,7 +7,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -28,12 +27,12 @@ public class ElasticSearchContext {
     /**
      * 所有任务
      */
-    private final Map<Integer, List<LoadData>> loadDataTasks = Collections.synchronizedMap( new HashMap<>() );
+    private final Map<Integer, List<LoadData>> loadDataTasks = new HashMap<>();
 
     /**
      * 任务顺序
      */
-    private final List<Integer> loadTaskOrder = new CopyOnWriteArrayList<>();
+    private final List<Integer> loadTaskOrder = new ArrayList<>();
 
     private static class ElasticSearchContextHolder {
         private static final ElasticSearchContext INSTANCE = new ElasticSearchContext();
@@ -87,28 +86,32 @@ public class ElasticSearchContext {
     }
 
     public static void addTasK(int order, LoadData loadData) {
-        if (context().loadTaskOrder.contains( order )) {
-            List<LoadData> loadDataList = context().loadDataTasks.get( order );
-            loadDataList.add( loadData );
-        } else {
-            context().loadTaskOrder.add( order );
-            List<LoadData> loadDataList = new ArrayList<>();
-            loadDataList.add( loadData );
-            context().loadDataTasks.put( order, loadDataList );
-            context().loadTaskOrder.sort( (o1, o2) -> o2 - o1 );
+        synchronized (context().loadTaskOrder) {
+            if (context().loadTaskOrder.contains( order )) {
+                List<LoadData> loadDataList = context().loadDataTasks.get( order );
+                loadDataList.add( loadData );
+            } else {
+                context().loadTaskOrder.add( order );
+                List<LoadData> loadDataList = new ArrayList<>();
+                loadDataList.add( loadData );
+                context().loadDataTasks.put( order, loadDataList );
+                context().loadTaskOrder.sort( (o1, o2) -> o2 - o1 );
+            }
         }
     }
 
     public static List<LoadData> getTask() {
-        if (CollectionUtils.isEmpty( context().loadTaskOrder )) {
-            // 所有任务已经处理完成
-            return Collections.emptyList();
+        synchronized (context().loadTaskOrder) {
+            if (CollectionUtils.isEmpty( context().loadTaskOrder )) {
+                // 所有任务已经处理完成
+                return Collections.emptyList();
+            }
+            int order = context().loadTaskOrder.get( context().loadTaskOrder.size() - 1 );
+            context().loadTaskOrder.remove( context().loadTaskOrder.size() - 1 );
+            List<LoadData> loadDataList = context().loadDataTasks.get( order );
+            context().loadDataTasks.remove( order );
+            return loadDataList;
         }
-        int order = context().loadTaskOrder.get( context().loadTaskOrder.size() - 1 );
-        context().loadTaskOrder.remove( context().loadTaskOrder.size() - 1 );
-        List<LoadData> loadDataList = context().loadDataTasks.get( order );
-        context().loadDataTasks.remove( order );
-        return loadDataList;
     }
 }
 

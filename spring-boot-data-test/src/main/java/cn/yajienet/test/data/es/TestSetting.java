@@ -1,6 +1,6 @@
 package cn.yajienet.test.data.es;
 
-import cn.yajienet.data.elasticsearch.es.Setting;
+import cn.yajienet.data.elasticsearch.setting.Setting;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 
 /**

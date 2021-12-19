@@ -10,11 +10,16 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.xml.sax.SAXException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -34,12 +39,15 @@ import java.util.Objects;
 @Download(remote = VideosRemoteDownload.class)
 public class VideosLoadData extends AbstractLoadDataAdapter<Videos> {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+
+    public VideosLoadData(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public String remoteUri() {
-        return "http://www.88zyw.net/inc/api.php";
+        return "https://www.88zyw.net/inc/api.php";
     }
 
     @Override
@@ -47,12 +55,21 @@ public class VideosLoadData extends AbstractLoadDataAdapter<Videos> {
         if (StringUtils.isEmpty( json )) {
             return;
         }
+
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null){
+            HttpServletRequest request = ((ServletWebRequest)requestAttributes).getRequest();
+            HttpSession session = request.getSession();
+
+        }
+
+
         List<String> dataList = new ArrayList<>();
         SAXReader reader = new SAXReader();
-        String result = json.replaceAll( "<br>", "" ).replace( "&", "&amp;" );
-        Document document = null;
+        String result = json.replace( "<br>", "" ).replace( "&", "&amp;" );
         try {
-            document = reader.read( new ByteArrayInputStream( result.getBytes( StandardCharsets.UTF_8 ) ) );
+            reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            Document document = reader.read( new ByteArrayInputStream( result.getBytes( StandardCharsets.UTF_8 ) ) );
             Element root = document.getRootElement();
             Element list = root.element( "list" );
             if (Objects.nonNull( list )) {
@@ -92,7 +109,7 @@ public class VideosLoadData extends AbstractLoadDataAdapter<Videos> {
                     }
                 }
             }
-        } catch (DocumentException e) {
+        } catch (DocumentException | SAXException e) {
             log.info( "load data error" );
         }
         this.save( dataList );

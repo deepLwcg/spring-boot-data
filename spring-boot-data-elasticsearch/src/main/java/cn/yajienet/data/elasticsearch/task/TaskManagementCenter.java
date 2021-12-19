@@ -37,6 +37,7 @@ public class TaskManagementCenter implements Runnable {
                 countDownLatch.await();
             } catch (InterruptedException e) {
                 log.error( "任务管理中心分配任务出错，已经停止运行......" );
+                Thread.currentThread().interrupt();
                 break;
             }
         }
